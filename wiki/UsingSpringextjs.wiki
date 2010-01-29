@@ -44,7 +44,7 @@ And return ModelAndView. They can also use any standard Spring annotations as ne
 {{{
 @ExtJsRemotingMethod(paramLength = 1)
 @RequestMapping (value="/updateUser", method = RequestMethod.POST)
-public ModelAndView updateQueueFormFieldConfig (Locale locale, HttpServletRequest request, @Valid User user,BindingResult result){
+public ModelAndView updateUser (Locale locale, HttpServletRequest request, @Valid User user,BindingResult result){
 .....
 }
 }}}
