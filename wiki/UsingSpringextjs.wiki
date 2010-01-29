@@ -15,7 +15,7 @@ This is as simple as extending a the base abstract controller
 {{{
 @Controller
 @RequestMapping(value = "/extjs/remoting")
-public class MyRemotingController extends BaseExtJsRemotingController{
+public class MyRemotingController extends ExtJsRemotingController{
 ...
 }
 }}}
