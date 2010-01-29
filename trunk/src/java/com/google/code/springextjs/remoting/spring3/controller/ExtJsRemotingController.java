@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package net.sf.springextjs.remoting.spring3;
+package com.google.code.springextjs.remoting.spring3.controller;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -18,15 +18,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.springextjs.remoting.annotations.Annotations.ExtJsRemotingMethod;
-import net.sf.springextjs.remoting.util.ExtJsRemotingUtil;
-import net.sf.springextjs.remoting.bean.ExtJsDirectRemotingRequestBean;
-import net.sf.springextjs.remoting.bean.ExtJsDirectRemotingResponseBean;
-import net.sf.springextjs.remoting.bean.ExtJsFormResultWrapperBean;
-import net.sf.springextjs.remoting.exceptions.UnAnnotatedFormHandlerException;
-import net.sf.springextjs.remoting.exceptions.UnAnnotatedRemoteMethodException;
-import net.sf.springextjs.remoting.util.JsonLibUtil;
-import net.sf.springextjs.remoting.view.ExtJsRemotingJacksonJsonView;
+import com.google.code.springextjs.remoting.annotations.Annotations.ExtJsRemotingMethod;
+import com.google.code.springextjs.remoting.util.ExtJsRemotingUtil;
+import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingRequestBean;
+import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingResponseBean;
+import com.google.code.springextjs.remoting.bean.ExtJsFormResultWrapperBean;
+import com.google.code.springextjs.remoting.exceptions.UnAnnotatedFormHandlerException;
+import com.google.code.springextjs.remoting.exceptions.UnAnnotatedRemoteMethodException;
+import com.google.code.springextjs.remoting.util.JsonLibUtil;
+import com.google.code.springextjs.remoting.spring3.view.ExtJsRemotingJacksonJsonView;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.MessageSource;
@@ -53,7 +53,16 @@ public abstract class ExtJsRemotingController {
     public ExtJsRemotingController() {
     }
 
-    
+    /**
+     * This is main router method with defualt RequestMapping /router.
+     * This is main entry point for all requests form and non form submits using
+     * ExtJS remoting.
+     * @param request
+     * @param response
+     * @param locale
+     * @return
+     * @throws UnAnnotatedRemoteMethodException
+     */
     @RequestMapping(value="/router", method = RequestMethod.POST)
     public ModelAndView router(HttpServletRequest request,HttpServletResponse response, Locale locale) throws UnAnnotatedRemoteMethodException{
 
@@ -97,7 +106,25 @@ public abstract class ExtJsRemotingController {
         return responseModelAndView (extJsRemotingResponses);
     }
 
-    protected ModelAndView remotingFormPostModelAndView (HttpServletRequest request, Locale locale, MessageSource messageSource, boolean isSuccess, String mainMessage, BindingResult bindingResult){
+    /**
+     * This method needs to be called by class which extends this ExtJS remoting
+     * form handling methods.
+     *
+     * @param request
+     * @param isSuccess Flag stating if the form submission completed successfully.
+     * @param locale Can be null
+     * @param messageSource - Can be null, Message resource object which has internationalized
+     * messages for form field validation failures. This method preserves Springs
+     * validation error handling on form submissions and displays field errors
+     * using ExtJS native field error rendering.
+     
+     * @param mainMessage Can be null, A Message which is passed back to browser and can be used
+     * to display form submission message. The message is passed in the return JSON but
+     * it is up to the developer to display it part of the form submit callback.
+     * @param bindingResult Can be null
+     * @return
+     */
+    protected ModelAndView remotingFormPostModelAndView (HttpServletRequest request, boolean isSuccess, Locale locale, MessageSource messageSource,String mainMessage, BindingResult bindingResult){
         ExtJsDirectRemotingResponseBean extJsRemotingResponse = new ExtJsDirectRemotingResponseBean ();
         
         extJsRemotingResponse.setSuccess(isSuccess);
@@ -129,6 +156,13 @@ public abstract class ExtJsRemotingController {
         return responseModelAndView (extJsRemotingResponse);
     }
 
+    /**
+     * This method returns a wrapper used to encapsulate the domain object which
+     * pertains to a form in ExtJS. The return object in any methods used to load forms
+     * must be wrapped using this.
+     * @param resultObject
+     * @return
+     */
     protected ExtJsFormResultWrapperBean getFormLoadObject (Object resultObject){
         return new ExtJsFormResultWrapperBean (resultObject, true);
     }
@@ -136,9 +170,9 @@ public abstract class ExtJsRemotingController {
     private static final ModelAndView responseModelAndView (Object resultObject){
         ModelAndView mnv =  new ModelAndView (new ExtJsRemotingJacksonJsonView());
         if (resultObject instanceof Collection)
-            mnv.addObject(JsonLibUtil.serializeObjectToJSONArray(resultObject));//enforces transient rule if first serialized to JSOBObject
+            mnv.addObject(JsonLibUtil.serializeObjectToJSONArray(resultObject));//enforces transient rule if first serialized to JSONObject
         else if (!(resultObject instanceof JSONObject))
-            mnv.addObject(JsonLibUtil.serializeObjectToJSONObject(resultObject));//enforces transient rule if first serialized to JSOBObject
+            mnv.addObject(JsonLibUtil.serializeObjectToJSONObject(resultObject));//enforces transient rule if first serialized to JSONObject
         else
             mnv.addObject(resultObject);
         return mnv;

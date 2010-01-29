@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package net.sf.springextjs.remoting.view;
+package com.google.code.springextjs.remoting.spring3.view;
 
 
 import java.util.Map;

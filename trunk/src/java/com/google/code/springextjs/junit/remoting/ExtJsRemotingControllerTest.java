@@ -3,13 +3,13 @@
  * and open the template in the editor.
  */
 
-package net.sf.springextjs.junit.remoting;
+package com.google.code.springextjs.junit.remoting;
 
 
 import java.util.Locale;
-import net.sf.springextjs.junit.remoting.mock.MockExtJsRemotingController;
-import net.sf.springextjs.junit.remoting.mock.MockExtJsRemotingHttpServletRequest;
-import net.sf.springextjs.remoting.exceptions.UnAnnotatedRemoteMethodException;
+import com.google.code.springextjs.junit.remoting.mock.MockExtJsRemotingController;
+import com.google.code.springextjs.junit.remoting.mock.MockExtJsRemotingHttpServletRequest;
+import com.google.code.springextjs.remoting.exceptions.UnAnnotatedRemoteMethodException;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;

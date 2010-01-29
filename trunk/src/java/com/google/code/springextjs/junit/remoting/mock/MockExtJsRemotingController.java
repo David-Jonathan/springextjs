@@ -3,10 +3,10 @@
  * and open the template in the editor.
  */
 
-package net.sf.springextjs.junit.remoting.mock;
+package com.google.code.springextjs.junit.remoting.mock;
 
-import net.sf.springextjs.remoting.annotations.Annotations.ExtJsRemotingMethod;
-import net.sf.springextjs.remoting.spring3.ExtJsRemotingController;
+import com.google.code.springextjs.remoting.annotations.Annotations.ExtJsRemotingMethod;
+import com.google.code.springextjs.remoting.spring3.controller.ExtJsRemotingController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
