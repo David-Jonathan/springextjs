@@ -1,0 +1,20 @@
+How to use springextjs
+
+= Introduction =
+
+The goal of this project is to easily integrate Spring3 with ExtJS remoting specification.
+I have tried to make it as simple as possible but I a msure there is much room for improvement.
+
+Polling remoting has not been completely worked out but will be is coming weeks.
+
+
+= Setting Up Controller=
+
+This is as simple as extending a the base abstract controller
+
+{{{
+public class MyRemotingController extends BaseExtJsRemotingController{
+...
+}
+}}}
+
