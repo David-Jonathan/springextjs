@@ -82,7 +82,7 @@ ExtJsRemotingMethod(paramLength = 1)
             }
 
         }
-        return this.remotingFormPostModelAndView(request, locale, this.messageSource, isSuccess, message, result);
+        return this.remotingFormPostModelAndView(request, isSuccess, locale, this.messageSource, message, result);
     }
 
 }}}
