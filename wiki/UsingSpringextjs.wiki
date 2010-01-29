@@ -90,7 +90,7 @@ ExtJsRemotingMethod(paramLength = 1)
 
 =Handling ExtJS Remoting Form Load API Calls=
 
-Form loads are to be implemented in non form submission controller methods with domain objects wrapped with the ExtJsFormResultWrapperBean class.  The protected method named "getFormLoadObject" in the BaseExtJsRemotingController can be used to wrap the object needed to load ExtJS form like:
+Form loads are to be implemented in non form submission controller methods with domain objects wrapped with the ExtJsFormResultWrapperBean class.  The protected method named "getFormLoadObject" in the ExtJsRemotingController can be used to wrap the object needed to load ExtJS form like:
 
 {{{
 @ExtJsRemotingMethod (paramLength = 1)
