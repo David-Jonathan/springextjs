@@ -31,7 +31,16 @@ public User getUser(long userId) throws Exception{
 
 Following the flexibility of Spring3, the input parameters can be any primitive or wrapper type, String, net.sf.json.JSONArray or net.sf.json.JSONObject, ServletRequest, ServletResponse, or Locale.
 
-All methods which are form handlers using POST should be annotated along with using any standard Spring annotations as needed
+=Form Handling in ExtJS Remoting Controllers=
+
+All methods which are form handlers should be annotated using Springs standard annotation of:
+
+{{{
+@RequestMapping (value="/updateUser", method = RequestMethod.POST)
+}}}
+
+And return ModelAndView. They can also use any standard Spring annotations as needed:
+
 {{{
 @ExtJsRemotingMethod(paramLength = 1)
 @RequestMapping (value="/updateUser", method = RequestMethod.POST)
@@ -41,6 +50,43 @@ public ModelAndView updateQueueFormFieldConfig (Locale locale, HttpServletReques
 }}}
 
 The parameters are limited to what Spring is limited to.
+
+=Form Handler Method Results=
+
+The results of form handler methods should be returned using the protected method "responseModelAndView". This method returns a special ExtJsRemotingJacksonJsonView object which is an extension of the MappingJacksonJsonView object. If this method is not used to return the object, the developer is free to write their own mechanism so long as it conforms to the ExtJS remoting spec.
+
+{{{
+ExtJsRemotingMethod(paramLength = 1)
+    @RequestMapping (value="/createUser", method = RequestMethod.POST)
+    public ModelAndView createUser (Locale locale, HttpServletRequest request, @Valid UserForm userForm, BindingResult result){
+        boolean isSuccess = false;
+        String message = null;
+        log.info("Attempting creating user: " + userForm.getUsername());
+        if (!result.hasErrors()){
+
+            try{
+                UserBean userBean = new UserBean ();
+                PropertyUtils.copyProperties(userBean, userForm);
+                this.userService.createUser(userBean, userForm.isNotifyUser());
+                isSuccess= true;
+                message = this.messageSource.getMessage("user.create.success.message", null, locale);
+                log.info("User created successfully with username: " + userForm.getUsername());
+            }
+            catch (UserNameNotAvailableException e){
+                log.error("Unable to create user, user name is taken: " +  userForm.getUsername());
+                result.rejectValue("username", "username.in.use.message", null, "Username is in use");
+            }
+            catch (Exception e){
+                log.error ("Error: " + e, e);
+                message = this.messageSource.getMessage("user.create.fail.message", null, locale);
+            }
+
+        }
+        return this.remotingFormPostModelAndView(request, locale, this.messageSource, isSuccess, message, result);
+    }
+
+}}}
+
 
 =Handling ExtJS Remoting Form Load API Calls=
 
