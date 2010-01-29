@@ -13,8 +13,59 @@ Polling remoting has not been completely worked out but will be is coming weeks.
 This is as simple as extending a the base abstract controller
 
 {{{
+@Controller
+@RequestMapping(value = "/admin/extjs/remoting")
 public class MyRemotingController extends BaseExtJsRemotingController{
 ...
 }
 }}}
 
+All methods in the controller which are non form submission should be annotated
+
+{{{
+@ExtJsRemotingMethod (paramLength = 1)
+public User getUser(long userId) throws Exception{
+    return userService.getUser(userId);        
+}
+}}}
+
+Following the flexibility of Spring3, the input parameters can be any primitive or wrapper type, String, net.sf.json.JSONArray or net.sf.json.JSONObject, or Locale.
+
+All methods which are form handlers using POST should be annotated along with using any standard Spring annotations as needed
+{{{
+@ExtJsRemotingMethod(paramLength = 1)
+@RequestMapping (value="/updateUser", method = RequestMethod.POST)
+public ModelAndView updateQueueFormFieldConfig (Locale locale, HttpServletRequest request, @Valid User user,BindingResult result){
+.....
+}
+}}}
+
+The parameters are limited to what Spring is limited to.
+
+= Setting Up Client JavaScript=
+
+Use the helper method to output the remoting API JSON
+
+{{{
+<script type="text/javascript"> 
+                <%=net.sf.springextjs.remoting.util.ExtJsRemotingUtil.createExtRemotingApiString(
+                        request.getContextPath() + "/extjs/remoting/router",
+                        my.spring.mvc.controller.MyExtJsRemotingController.class,
+                        "MyRemotingApi")%>
+
+....
+                         
+</script>
+}}}
+
+This will auto generate the remoting code off your controller like:
+{{{
+MyRemotingApi = {....}
+}}}
+
+And you can use it as stated in the ExtJS documentation:
+
+{{{
+var remotingProvider = new Ext.direct.RemotingProvider (MyRemotingApi);
+Ext.Direct.addProvider(remotingProvider);
+}}}
