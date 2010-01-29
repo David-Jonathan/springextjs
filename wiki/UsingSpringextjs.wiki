@@ -53,7 +53,7 @@ The parameters are limited to what Spring is limited to.
 
 =Form Handler Method Results=
 
-The results of form handler methods should be returned using the protected method "responseModelAndView". This method returns a special ExtJsRemotingJacksonJsonView object which is an extension of the MappingJacksonJsonView object. If this method is not used to return the object, the developer is free to write their own mechanism so long as it conforms to the ExtJS remoting spec.
+The results of form handler methods should be returned using the protected method "responseModelAndView". This method returns a special ExtJsRemotingJacksonJsonView object which is an extension of the MappingJacksonJsonView object. If this method is not used to return the object, the developer is free to write their own mechanism so long as it conforms to the ExtJS remoting spec. The MessageSource object passed in the "responseModelAndView" method contains messages for field validation in case of validation failure. Besides request and isSuccess parameters, everything else passed in the "responseModelAndView" method can be null.
 
 {{{
 ExtJsRemotingMethod(paramLength = 1)
@@ -101,7 +101,7 @@ public ExtJsFormResultWrapperBean loadUser (long userId) throws Exception{
 
 = Setting Up Client JavaScript=
 
-Use the helper method to output the remoting API JSON
+Use the utility method to output the remoting API JSON in the browser:
 
 {{{
 <script type="text/javascript"> 
@@ -115,14 +115,18 @@ Use the helper method to output the remoting API JSON
 </script>
 }}}
 
+
 This will auto generate the remoting code off your controller like:
+
 {{{
 MyRemotingApi = {....}
 }}}
 
-And you can use it as stated in the ExtJS documentation:
+And use it as stated in the ExtJS documentation like:
 
 {{{
 var remotingProvider = new Ext.direct.RemotingProvider (MyRemotingApi);
 Ext.Direct.addProvider(remotingProvider);
 }}}
+
+You can just as easily call the utility on the server and pass the generated ExtJS remoting API to the browser using an init Ajax call then load the API in ExtJS as stated above.
