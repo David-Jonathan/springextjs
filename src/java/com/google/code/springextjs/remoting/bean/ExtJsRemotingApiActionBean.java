@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package net.sf.springextjs.remoting.bean;
+package com.google.code.springextjs.remoting.bean;
 
 /**
  *

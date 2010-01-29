@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package net.sf.springextjs.remoting.util;
+package com.google.code.springextjs.remoting.util;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;

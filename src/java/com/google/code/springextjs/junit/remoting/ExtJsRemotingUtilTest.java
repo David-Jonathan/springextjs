@@ -3,16 +3,16 @@
  * and open the template in the editor.
  */
 
-package net.sf.springextjs.junit.remoting;
+package com.google.code.springextjs.junit.remoting;
 
 
 import static org.junit.Assert.*;
 
 import java.util.List;
-import net.sf.springextjs.junit.remoting.mock.MockExtJsRemotingController;
-import net.sf.springextjs.junit.remoting.mock.MockExtJsRemotingHttpServletRequest;
-import net.sf.springextjs.remoting.bean.ExtJsDirectRemotingRequestBean;
-import net.sf.springextjs.remoting.util.ExtJsRemotingUtil;
+import com.google.code.springextjs.junit.remoting.mock.MockExtJsRemotingController;
+import com.google.code.springextjs.junit.remoting.mock.MockExtJsRemotingHttpServletRequest;
+import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingRequestBean;
+import com.google.code.springextjs.remoting.util.ExtJsRemotingUtil;
 import org.junit.Before;
 import org.junit.Test;
 

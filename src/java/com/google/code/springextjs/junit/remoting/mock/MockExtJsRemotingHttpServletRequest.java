@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package net.sf.springextjs.junit.remoting.mock;
+package com.google.code.springextjs.junit.remoting.mock;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
