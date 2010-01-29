@@ -42,13 +42,24 @@ public ModelAndView updateQueueFormFieldConfig (Locale locale, HttpServletReques
 
 The parameters are limited to what Spring is limited to.
 
+=Handling ExtJS Remoting Form Load API Calls=
+
+Form loads are to be implemented in non form submission controller methods with domain objects wrapped with the ExtJsFormResultWrapperBean class.  The protected method named "getFormLoadObject" in the BaseExtJsRemotingController can be used to wrap the object needed to load EXtJS form like:
+
+{{{
+@ExtJsRemotingMethod (paramLength = 1)
+public ExtJsFormResultWrapperBean loadUser (long userId) throws Exception{
+    return this.getFormLoadObject(this.userService.loadUser(userId));
+}
+}}}
+
 = Setting Up Client JavaScript=
 
 Use the helper method to output the remoting API JSON
 
 {{{
 <script type="text/javascript"> 
-                <%=net.sf.springextjs.remoting.util.ExtJsRemotingUtil.createExtRemotingApiString(
+                <%= com.google.code.springextjs.remoting.util.ExtJsRemotingUtil.createExtRemotingApiString(
                         request.getContextPath() + "/extjs/remoting/router",
                         my.spring.mvc.controller.MyExtJsRemotingController.class,
                         "MyRemotingApi")%>
