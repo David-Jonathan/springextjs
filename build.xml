@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="springextjs" default="all" basedir=".">
+
+    <property name="classpath" value="${basedir}\lib\"/>
+    <property name="project" value="springextjs" />
+    <property name="version" value="0.9-beta" />
+    <property name="jar.file" value="${project}-${version}.jar" />
+    <property name="lib.dir" value="${basedir}\lib" />
+    <property name="build.dir" value="${basedir}\build" />
+    <property name="src" value="${basedir}\src\java" />
+
+    <path id="lib.classpath">
+        <fileset dir="${classpath}">
+            <include name="**/*.jar"/>
+          </fileset>
+    </path>
+
+    <target name="clean">
+        <mkdir dir="${build.dir}" />
+        <delete>
+            <fileset dir="${build.dir}">
+                <include name="**/*.*"/>
+            </fileset>
+        </delete>
+
+        <delete dir="${build.dir}/">
+        </delete>
+    </target>
+
+    <target name="prepare" depends="clean">
+      <mkdir dir="${build.dir}/java" />
+    </target>
+
+    <target name="compile" depends="prepare">
+        <javac debug="true" includes="**/*.java" optimize="false" srcdir="${src}" destdir="${build.dir}/java" source="1.5" target="1.5">
+            <classpath>
+              <path refid="lib.classpath"/>
+            </classpath>
+        </javac>
+
+        <copy todir="${build.dir}/java">
+            <fileset dir="${src}">
+                <include name="**/*properties"/>
+            </fileset>
+       </copy>
+
+    </target>
+
+    <target name="jar" depends="compile">
+        <jar basedir="${build.dir}\java" destfile="${build.dir}\${jar.file}" includes="**/*.*" />
+    </target>
+
+    <target name="junit" depends="jar">
+      <junit fork="yes" haltonfailure="yes">
+        <classpath>
+            <path refid="lib.classpath"/>
+            <fileset dir="${build.dir}\">
+                <include name="${jar.file}"/>
+            </fileset>
+        </classpath>
+        <formatter type="plain" usefile="false" />
+        <test name="com.google.code.springextjs.junit.remoting.ExtJsRemotingUtilTest" />
+        <test name="com.google.code.springextjs.junit.remoting.ExtJsRemotingControllerTest" />
+      </junit>
+    </target>
+
+</project>
