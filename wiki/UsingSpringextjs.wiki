@@ -29,7 +29,7 @@ public User getUser(long userId) throws Exception{
 }
 }}}
 
-Following the flexibility of Spring3, the input parameters can be any primitive or wrapper type, String, net.sf.json.JSONArray or net.sf.json.JSONObject, or Locale.
+Following the flexibility of Spring3, the input parameters can be any primitive or wrapper type, String, net.sf.json.JSONArray or net.sf.json.JSONObject, ServletRequest, ServletResponse, or Locale.
 
 All methods which are form handlers using POST should be annotated along with using any standard Spring annotations as needed
 {{{
