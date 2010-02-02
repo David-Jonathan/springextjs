@@ -217,13 +217,13 @@ public abstract class ExtJsRemotingController {
 
                     else if (extReqBean.getData() != null && extReqBean.getData().size() > 0){
                         Object paramVal = extReqBean.getData().get(jsonParamIndex);
-                        if (paramClass.equals(String.class) && paramVal instanceof JSONObject){
+                        if (paramClass.equals(String.class) && paramVal.getClass().isAssignableFrom(JSONObject.class)){
                             paramVal = paramVal.toString();
                         }
-                        else if (paramClass.equals(String.class) && paramVal instanceof JSONArray){
+                        else if (paramClass.equals(String.class) && paramVal.getClass().isAssignableFrom(JSONArray.class)){
                             paramVal = paramVal.toString();
                         }
-                        else if (!paramClass.equals(JSONObject.class) && paramVal instanceof JSONObject){
+                        else if (!paramClass.equals(JSONObject.class) && paramVal.getClass().isAssignableFrom(JSONObject.class)){
                              paramVal = JsonLibUtil.deserializeJSONObjectToObject((JSONObject) paramVal, paramClass);
                         }
                         jsonParamIndex++;
