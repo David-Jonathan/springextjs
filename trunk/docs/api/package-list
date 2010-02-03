@@ -1,0 +1,8 @@
+com.google.code.springextjs.junit.remoting
+com.google.code.springextjs.junit.remoting.mock
+com.google.code.springextjs.remoting.annotations
+com.google.code.springextjs.remoting.bean
+com.google.code.springextjs.remoting.exceptions
+com.google.code.springextjs.remoting.spring3.controller
+com.google.code.springextjs.remoting.spring3.view
+com.google.code.springextjs.remoting.util
