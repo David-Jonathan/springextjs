@@ -8,6 +8,8 @@
     <property name="lib.dir" value="${basedir}\lib" />
     <property name="build.dir" value="${basedir}\build" />
     <property name="src" value="${basedir}\src\java" />
+    <property name="war.dir" value="${basedir}\src\web" />
+    <property name="war.file" value="${project}-sample.war" />
 
     <path id="lib.classpath">
         <fileset dir="${classpath}">
@@ -47,7 +49,63 @@
     </target>
 
     <target name="jar" depends="compile">
-        <jar basedir="${build.dir}\java" destfile="${build.dir}\${jar.file}" includes="**/*.*" />
+        <jar basedir="${build.dir}\java" destfile="${build.dir}\${jar.file}" includes="**/*.*" excludes="**/junit/** **/sample/**" />
+    </target>
+
+    <target name="war" depends="jar" >
+        <war destfile="${build.dir}/${war.file}" webxml="${war.dir}/WEB-INF/web.xml">
+            <fileset dir="${war.dir}" includes="**/*.jsp"/>
+            <fileset dir="${war.dir}" includes="css/*.css"/>
+            <fileset dir="${war.dir}" includes="images/**/*.*"/>
+
+            <fileset dir="${war.dir}" includes="scripts/**/*.*"/>
+            <fileset dir="${war.dir}" includes="scripts/*.*"/>
+
+            <lib dir="${lib.dir}\commons">
+              <include name="**/*.jar"/>
+            </lib>
+
+            <lib dir="${lib.dir}\jackson">
+              <include name="**/*.jar"/>
+            </lib>
+
+            <lib dir="${lib.dir}\json-lib">
+              <include name="**/*.jar"/>
+            </lib>
+
+            <lib dir="${lib.dir}\log4j">
+              <include name="**/*.jar"/>
+            </lib>
+
+            <lib dir="${lib.dir}\spring3">
+              <include name="**/*.jar"/>
+            </lib>
+
+            <classes dir="${build.dir}/java">
+              <include name="**/*.*"/>
+              <exclude name="**/junit/**"/>
+
+            </classes>
+
+             <metainf dir="${war.dir}/META-INF">
+              <include name="**/*.xml"/>
+             </metainf>
+
+             <webinf dir="${war.dir}/WEB-INF">
+
+              <include name="**/*.wsdd"/>
+              <include name="**/*.tld"/>
+              <include name="**/*.xml"/>
+              <include name="**/*.xml"/>
+              <include name="**/*.ftl"/>
+
+              <include name="**/*.properties"/>
+
+
+            </webinf>
+
+        </war>
+
     </target>
 
     <target name="junit" depends="jar">
