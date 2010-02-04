@@ -22,8 +22,8 @@ public class RemotingController extends ExtJsRemotingController{
     }
 
     @ExtJsRemotingMethod (paramLength = 1)
-    public Long multiply (long num){
-        return num*8;
+    public Long multiply (String num){
+        return Long.valueOf(num)*8;
     }
 
     @ExtJsRemotingMethod (paramLength = 1)
