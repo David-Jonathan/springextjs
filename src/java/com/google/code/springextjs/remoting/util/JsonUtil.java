@@ -13,10 +13,10 @@ import net.sf.json.JsonConfig;
  *
  * @author mansari
  */
-public class JsonLibUtil {
+public class JsonUtil {
 
     /** Creates a new instance of JSONLibUtil */
-    public JsonLibUtil() {
+    public JsonUtil() {
     }
     
     public static JSONObject serializeObjectToJSONObject (Object obj) {
@@ -43,7 +43,7 @@ public class JsonLibUtil {
         return JSONObject.toBean(jsonObject, jsonConfig);
     }
 
-    protected static JsonConfig createJsonConfig (){
+    private static JsonConfig createJsonConfig (){
          JsonConfig jsonConfig = new JsonConfig ();
          jsonConfig.setIgnoreTransientFields(true);
          return jsonConfig;
