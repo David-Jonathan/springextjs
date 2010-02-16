@@ -25,7 +25,7 @@ import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingResponseBean
 import com.google.code.springextjs.remoting.bean.ExtJsFormResultWrapperBean;
 import com.google.code.springextjs.remoting.exceptions.UnAnnotatedFormHandlerException;
 import com.google.code.springextjs.remoting.exceptions.UnAnnotatedRemoteMethodException;
-import com.google.code.springextjs.remoting.util.JsonLibUtil;
+import com.google.code.springextjs.remoting.util.JsonUtil;
 import com.google.code.springextjs.remoting.spring3.view.ExtJsRemotingJacksonJsonView;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -81,6 +81,9 @@ public abstract class ExtJsRemotingController {
                     Object result = processRemotingRequest (request, response, locale, this, extReqBean);
                     if (result == null)
                         result = new JSONObject ();
+                    else if (isFormLoadMethod(this, extReqBean)){
+                        result = getFormLoadObject(result);//if form load wrap in special form load object
+                    }
                     extJsRemotingResponse.setResult(result);
                 }
             }
@@ -163,18 +166,19 @@ public abstract class ExtJsRemotingController {
      * @param resultObject
      * @return
      */
-    protected ExtJsFormResultWrapperBean getFormLoadObject (Object resultObject){
+    private static ExtJsFormResultWrapperBean getFormLoadObject (Object resultObject){
         return new ExtJsFormResultWrapperBean (resultObject, true);
     }
 
     private static final ModelAndView responseModelAndView (Object resultObject){
         ModelAndView mnv =  new ModelAndView (new ExtJsRemotingJacksonJsonView());
-        if (resultObject instanceof Collection)
+        /*if (resultObject instanceof Collection)//use instance of instead of isAssignableFrom to handle Array's
             mnv.addObject(JsonLibUtil.serializeObjectToJSONArray(resultObject));//enforces transient rule if first serialized to JSONObject
-        else if (!(resultObject instanceof JSONObject))
+        else if (!(resultObject.getClass().isAssignableFrom(JSONObject.class)))
             mnv.addObject(JsonLibUtil.serializeObjectToJSONObject(resultObject));//enforces transient rule if first serialized to JSONObject
         else
-            mnv.addObject(resultObject);
+            mnv.addObject(resultObject);*/
+        mnv.addObject(resultObject);
         return mnv;
     }
 
@@ -224,7 +228,7 @@ public abstract class ExtJsRemotingController {
                             paramVal = paramVal.toString();
                         }
                         else if (!paramClass.equals(JSONObject.class) && paramVal.getClass().isAssignableFrom(JSONObject.class)){
-                             paramVal = JsonLibUtil.deserializeJSONObjectToObject((JSONObject) paramVal, paramClass);
+                             paramVal = JsonUtil.deserializeJSONObjectToObject((JSONObject) paramVal, paramClass);
                         }
                         jsonParamIndex++;
                         params[paramIndex] = paramVal;
@@ -239,6 +243,11 @@ public abstract class ExtJsRemotingController {
         }
         else
             throw new UnAnnotatedRemoteMethodException ("Invalid remoting method: " + extReqBean.getMethod() + ". Perhaps you forgot to add the @ExtJsRemotingMethod annotation to your remoting method?");
+    }
+
+    private static final boolean isFormLoadMethod (ExtJsRemotingController controller, ExtJsDirectRemotingRequestBean extReqBean) throws Exception{
+        Method method = getCorrespondingJavaMethod (controller, extReqBean.getMethod());
+        return method.getAnnotation(ExtJsRemotingMethod.class).formLoad();
     }
 
     private static final Method getCorrespondingJavaMethod (ExtJsRemotingController controller, String methodName) throws Exception{
