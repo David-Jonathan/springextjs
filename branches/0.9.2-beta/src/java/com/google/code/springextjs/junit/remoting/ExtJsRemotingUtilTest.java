@@ -25,10 +25,8 @@ public class ExtJsRemotingUtilTest {
     private String singleMethodRequestWithParamString = "{\"action\":\"Remoting\",\"method\":\"getConfig\",\"data\":[3,2.5, \"string.param\"],\"type\":\"rpc\",\"tid\":2}";
     private MockExtJsRemotingHttpServletRequest singleMethodRequestWithParam;
 
-    //private MockExtJsRemotingController controller;
     
     @Before public void setUp() {
-        //this.controller = new MockExtJsRemotingController ();
         singleMethodRequestWithParam = new  MockExtJsRemotingHttpServletRequest (singleMethodRequestWithParamString);
     }
 
@@ -39,20 +37,19 @@ public class ExtJsRemotingUtilTest {
 
         ExtJsDirectRemotingRequestBean extReq = extReqs.get(0);
         assertEquals("Remoting", extReq.getAction());
-        assertEquals(3, extReq.getData().size());
+        assertEquals(3, extReq.getData().length);
         assertEquals("getConfig", extReq.getMethod());
         assertEquals(2, extReq.getTid());
         assertEquals("rpc", extReq.getType());
 
-        assertEquals(Integer.class,extReq.getData().get(0).getClass());
-        assertEquals(Double.class,extReq.getData().get(1).getClass());
-        assertEquals(String.class,extReq.getData().get(2).getClass());
+        assertEquals(Integer.class,extReq.getData()[0].getClass());
+        assertEquals(Double.class,extReq.getData()[1].getClass());
+        assertEquals(String.class,extReq.getData()[2].getClass());
     }
 
     @Test
     public void testCreateExtRemotingApiString (){
         String api = ExtJsRemotingUtil.createExtRemotingApiString("www.google.com", MockExtJsRemotingController.class);
-        System.out.print("API: " + api);
         assertNotNull (api);
     }
 

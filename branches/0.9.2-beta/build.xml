@@ -49,7 +49,8 @@
     </target>
 
     <target name="jar" depends="compile">
-        <jar basedir="${build.dir}\java" destfile="${build.dir}\${jar.file}" includes="**/*.*" excludes="**/junit/** **/sample/**" />
+        <!--<jar basedir="${build.dir}\java" destfile="${build.dir}\${jar.file}" includes="**/*.*" excludes="**/junit/** **/sample/**" />-->
+        <jar basedir="${build.dir}\java" destfile="${build.dir}\${jar.file}" includes="**/*.*" excludes="" />
     </target>
 
     <target name="war" depends="jar" >
@@ -119,6 +120,7 @@
         <formatter type="plain" usefile="false" />
         <test name="com.google.code.springextjs.junit.remoting.ExtJsRemotingUtilTest" />
         <test name="com.google.code.springextjs.junit.remoting.ExtJsRemotingControllerTest" />
+        <test name="com.google.code.springextjs.junit.remoting.util.JsonUtilTest" />
       </junit>
     </target>
 
