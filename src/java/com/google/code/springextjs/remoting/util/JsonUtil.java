@@ -5,9 +5,12 @@
 
 package com.google.code.springextjs.remoting.util;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JsonConfig;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
 
 /**
  *
@@ -15,37 +18,44 @@ import net.sf.json.JsonConfig;
  */
 public class JsonUtil {
 
+    private static final Log log = LogFactory.getLog(JsonUtil.class);
+    
     /** Creates a new instance of JSONLibUtil */
     public JsonUtil() {
     }
     
-    public static JSONObject serializeObjectToJSONObject (Object obj) {
-        if (obj == null)
+    public static String serializeObjectToJson(Object obj) {
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.writeValueAsString(obj);
+        }
+        catch (Exception e){
+            log.info("Error: " + e, e);
             return null;
-        else{
-            JsonConfig jsonConfig = createJsonConfig ();
-            return JSONObject.fromObject(obj, jsonConfig);
+        }
+        
+    }
+
+    public static List serializeJsonArrayToList (String jsonArray,TypeReference typeReference) {
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            ArrayList<Object> result = mapper.readValue(jsonArray, typeReference);
+            return result;
+        }
+        catch (Exception e){
+            log.info("Error: " + e, e);
+            return null;
         }
     }
 
-    public static JSONArray serializeObjectToJSONArray (Object obj) {
-        if (obj == null)
-            return null;
-        else{
-            JsonConfig jsonConfig = createJsonConfig ();
-            return JSONArray.fromObject(obj, jsonConfig);
+    public static Object deserializeJsonToObject (String json, Class clazz){
+        try{
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(json, clazz);
         }
-    }
-
-    public static Object deserializeJSONObjectToObject (JSONObject jsonObject, Class clazz){
-        JsonConfig jsonConfig = createJsonConfig();
-        jsonConfig.setRootClass(clazz);
-        return JSONObject.toBean(jsonObject, jsonConfig);
-    }
-
-    private static JsonConfig createJsonConfig (){
-         JsonConfig jsonConfig = new JsonConfig ();
-         jsonConfig.setIgnoreTransientFields(true);
-         return jsonConfig;
+        catch (Exception e){
+            log.info("Error: " + e, e);
+            return null;
+        }
     }
 }

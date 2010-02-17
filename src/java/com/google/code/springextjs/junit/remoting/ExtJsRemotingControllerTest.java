@@ -5,14 +5,18 @@
 
 package com.google.code.springextjs.junit.remoting;
 
+import static org.junit.Assert.*;
 
 import java.util.Locale;
 import com.google.code.springextjs.junit.remoting.mock.MockExtJsRemotingController;
 import com.google.code.springextjs.junit.remoting.mock.MockExtJsRemotingHttpServletRequest;
+import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingResponseBean;
 import com.google.code.springextjs.remoting.exceptions.UnAnnotatedRemoteMethodException;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.web.servlet.ModelAndView;
 
 
 /**
@@ -36,6 +40,9 @@ public class ExtJsRemotingControllerTest{
     private String singleMethodRequestWithParamNotAnnotatedString = "{\"action\":\"Remoting\",\"method\":\"doWork3\",\"data\":[3,2.5, \"string.param\"],\"type\":\"rpc\",\"tid\":2}";
     private MockExtJsRemotingHttpServletRequest singleMethodRequestWithParamNotAnnotated;
 
+    private String multiMethodRequestWithParamString = "[{\"action\":\"Remoting\",\"method\":\"doWork1\",\"data\":null,\"type\":\"rpc\",\"tid\":1},{\"action\":\"Remoting\",\"method\":\"doWork2\",\"data\":[3,2.5, \"string.param\"],\"type\":\"rpc\",\"tid\":2}]";
+    private MockExtJsRemotingHttpServletRequest multiMethodRequestWithParam;
+
     private String configRequestString = "{\"action\":\"AdminExtJsRemotingController\",\"method\":\"getConfig\",\"data\":null,\"type\":\"rpc\",\"tid\":2}";
     private MockExtJsRemotingHttpServletRequest configRequest;
 
@@ -50,38 +57,58 @@ public class ExtJsRemotingControllerTest{
         this.singleMethodRequestWithNoParam = new MockExtJsRemotingHttpServletRequest(singleMethodRequestWithNoParamString);
         this.singleMethodRequestWithParam = new  MockExtJsRemotingHttpServletRequest (singleMethodRequestWithParamString);
         this.singleMethodRequestWithParamNotAnnotated = new  MockExtJsRemotingHttpServletRequest (singleMethodRequestWithParamNotAnnotatedString);
+        this.multiMethodRequestWithParam = new  MockExtJsRemotingHttpServletRequest (multiMethodRequestWithParamString);
+
+
         this.configRequest = new MockExtJsRemotingHttpServletRequest (configRequestString);
         this.formHandlerRequest = new MockExtJsRemotingHttpServletRequest (formHandlerRequestRequestString);
     }
 
-    @Test
-    public void testRouter () throws Exception{
-        System.out.println ("Running: testRouter");
-        /*String responseJson = controller.router(singleMethodRequestWithNoParam, response);
-        JSONObject responseJsonObj = JsonLibUtil.serializeObjectToJSONObject(responseJson);
-        assertEquals("doWork1.called", responseJsonObj.get("result"));
-        //System.out.println ("Response: " + responseJson);
-
-        responseJson = controller.router(singleMethodRequestWithParam, response);
-        responseJsonObj = JsonLibUtil.serializeObjectToJSONObject(responseJson);
-        assertEquals("doWork2.called", responseJsonObj.get("result"));
-
-        responseJson = controller.router(configRequest, response);
-        responseJsonObj = JsonLibUtil.serializeObjectToJSONObject(responseJson);
-        assertEquals("getConfig.called", responseJsonObj.get("result"));
-
-        //formHandlerRequest.setParameter("extMethod", "testFormMethod");
-        String forwardPath = controller.router(formHandlerRequest, response);
-        assertEquals("forward:/testFormMethod", forwardPath);*/
-        
-        //ModelAndView modelAndView = controller.router(singleMethodRequestWithNoParam, response);
-        //JSONObject responseJsonObj = JsonLibUtil.serializeObjectToJSONObject(responseJson);
-        //assertEquals("doWork1.called", responseJsonObj.get("result"));
-    }
-
     @Test(expected=UnAnnotatedRemoteMethodException.class)
     public void testUnAnnotatedRemoteMethodException() throws Exception{
-        System.out.println ("Running: testUnAnnotatedRemoteMethodException");
         controller.router(singleMethodRequestWithParamNotAnnotated, response, Locale.ENGLISH);
+    }
+
+    @Test
+    public void testSingleValidRequestWithNoParams () throws Exception{
+        ModelAndView mnv = controller.router(singleMethodRequestWithNoParam, response, Locale.ENGLISH);
+        List<ExtJsDirectRemotingResponseBean> resps = (List<ExtJsDirectRemotingResponseBean>) mnv.getModel().get(mnv.getModel().keySet().iterator().next());
+        
+        assertTrue (resps.size() == 1);
+        assertEquals (resps.get(0).getAction(), "Remoting");
+        assertEquals (resps.get(0).getMethod(), "doWork1");
+        assertEquals (resps.get(0).getTid(), 2);
+        assertEquals (resps.get(0).getType(), "rpc");
+    }
+
+    @Test
+    public void testSingleValidRequestWithParams () throws Exception{
+        ModelAndView mnv = controller.router(singleMethodRequestWithParam, response, Locale.ENGLISH);
+        List<ExtJsDirectRemotingResponseBean> resps = (List<ExtJsDirectRemotingResponseBean>) mnv.getModel().get(mnv.getModel().keySet().iterator().next());
+
+        assertTrue (resps.size() == 1);
+
+        assertEquals (resps.get(0).getAction(), "Remoting");
+        assertEquals (resps.get(0).getMethod(), "doWork2");
+        assertEquals (resps.get(0).getTid(), 2);
+        assertEquals (resps.get(0).getType(), "rpc");
+    }
+
+    @Test
+    public void testMultipleValidRequestWithNoParams () throws Exception{
+        ModelAndView mnv = controller.router(multiMethodRequestWithParam, response, Locale.ENGLISH);
+        List<ExtJsDirectRemotingResponseBean> resps = (List<ExtJsDirectRemotingResponseBean>) mnv.getModel().get(mnv.getModel().keySet().iterator().next());
+
+        assertTrue (resps.size() == 2);
+
+        assertEquals (resps.get(0).getAction(), "Remoting");
+        assertEquals (resps.get(0).getMethod(), "doWork1");
+        assertEquals (resps.get(0).getTid(), 1);
+        assertEquals (resps.get(0).getType(), "rpc");
+
+        assertEquals (resps.get(1).getAction(), "Remoting");
+        assertEquals (resps.get(1).getMethod(), "doWork2");
+        assertEquals (resps.get(1).getTid(), 2);
+        assertEquals (resps.get(1).getType(), "rpc");
     }
 }

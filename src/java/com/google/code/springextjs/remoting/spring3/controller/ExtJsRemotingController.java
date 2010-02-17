@@ -172,12 +172,6 @@ public abstract class ExtJsRemotingController {
 
     private static final ModelAndView responseModelAndView (Object resultObject){
         ModelAndView mnv =  new ModelAndView (new ExtJsRemotingJacksonJsonView());
-        /*if (resultObject instanceof Collection)//use instance of instead of isAssignableFrom to handle Array's
-            mnv.addObject(JsonLibUtil.serializeObjectToJSONArray(resultObject));//enforces transient rule if first serialized to JSONObject
-        else if (!(resultObject.getClass().isAssignableFrom(JSONObject.class)))
-            mnv.addObject(JsonLibUtil.serializeObjectToJSONObject(resultObject));//enforces transient rule if first serialized to JSONObject
-        else
-            mnv.addObject(resultObject);*/
         mnv.addObject(resultObject);
         return mnv;
     }
@@ -206,32 +200,29 @@ public abstract class ExtJsRemotingController {
                 params = new Object[classes.length];
                 int paramIndex = 0;
                 int jsonParamIndex = 0;
-                for (Class paramClass : classes){
+                for (Class methodParamClass : classes){
 
 
-                    if (ServletResponse.class.isAssignableFrom(paramClass)){
+                    if (ServletResponse.class.isAssignableFrom(methodParamClass)){
                         params[paramIndex] = response;
                     }
-                    else if (ServletRequest.class.isAssignableFrom(paramClass)){
+                    else if (ServletRequest.class.isAssignableFrom(methodParamClass)){
                         params[paramIndex] = request;
                     }
-                    else if (Locale.class.isAssignableFrom(paramClass)){
+                    else if (Locale.class.isAssignableFrom(methodParamClass)){
                         params[paramIndex] = locale;
                     }
 
-                    else if (extReqBean.getData() != null && extReqBean.getData().size() > 0){
-                        Object paramVal = extReqBean.getData().get(jsonParamIndex);
-                        if (paramClass.equals(String.class) && paramVal.getClass().isAssignableFrom(JSONObject.class)){
-                            paramVal = paramVal.toString();
+                    else if (extReqBean.getData() != null && extReqBean.getData().length > 0){
+                        Object passedParamVal = extReqBean.getData()[jsonParamIndex];
+
+                        //if methodParamClass can be deserialized from a string to object
+                        if (methodParamClass.isAssignableFrom(Object.class) && !methodParamClass.getClass().equals(String.class) && !methodParamClass.isPrimitive() && passedParamVal.getClass().equals(String.class)){
+                            passedParamVal = JsonUtil.deserializeJsonToObject(passedParamVal.toString(), methodParamClass);
                         }
-                        else if (paramClass.equals(String.class) && paramVal.getClass().isAssignableFrom(JSONArray.class)){
-                            paramVal = paramVal.toString();
-                        }
-                        else if (!paramClass.equals(JSONObject.class) && paramVal.getClass().isAssignableFrom(JSONObject.class)){
-                             paramVal = JsonUtil.deserializeJSONObjectToObject((JSONObject) paramVal, paramClass);
-                        }
+                        
                         jsonParamIndex++;
-                        params[paramIndex] = paramVal;
+                        params[paramIndex] = passedParamVal;
                     }
                     else
                         throw new Exception ("Error, param mismatch. Please check your remoting method signature to ensure all supported param types are used.");
