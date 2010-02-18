@@ -70,10 +70,6 @@
               <include name="**/*.jar"/>
             </lib>
 
-            <lib dir="${lib.dir}\json-lib">
-              <include name="**/*.jar"/>
-            </lib>
-
             <lib dir="${lib.dir}\log4j">
               <include name="**/*.jar"/>
             </lib>
