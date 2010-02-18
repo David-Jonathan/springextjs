@@ -5,8 +5,6 @@
 
 package com.google.code.springextjs.remoting.bean;
 
-import net.sf.json.JSONArray;
-
 /**
  *
  * @author mansari

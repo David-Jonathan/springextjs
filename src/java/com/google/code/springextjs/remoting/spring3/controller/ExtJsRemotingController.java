@@ -7,7 +7,6 @@ package com.google.code.springextjs.remoting.spring3.controller;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -16,8 +15,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import com.google.code.springextjs.remoting.annotations.Annotations.ExtJsRemotingMethod;
 import com.google.code.springextjs.remoting.util.ExtJsRemotingUtil;
 import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingRequestBean;
@@ -71,19 +68,22 @@ public abstract class ExtJsRemotingController {
         for (ExtJsDirectRemotingRequestBean extReqBean : extRemotingRequests){
             ExtJsDirectRemotingResponseBean extJsRemotingResponse = createBaseResponse(extReqBean);
             try{
-                log.info("Method fired: " + extReqBean.getMethod());
+
+                if (log.isDebugEnabled())
+                    log.debug("Method fired: " + extReqBean.getMethod());
+
                 if (extReqBean.isForm()){
                     String forwardPath = getForwardPathForFormMethod (this, extReqBean, request);
-                    log.info("Form forward path: " + forwardPath);
+                    if (log.isDebugEnabled())
+                        log.debug("Form forward path: " + forwardPath);
                     return new ModelAndView("forward:" + forwardPath);
                 }
                 else{
                     Object result = processRemotingRequest (request, response, locale, this, extReqBean);
-                    if (result == null)
-                        result = new JSONObject ();
-                    else if (isFormLoadMethod(this, extReqBean)){
+
+                    if (result != null && isFormLoadMethod(this, extReqBean))
                         result = getFormLoadObject(result);//if form load wrap in special form load object
-                    }
+                    
                     extJsRemotingResponse.setResult(result);
                 }
             }
@@ -216,9 +216,11 @@ public abstract class ExtJsRemotingController {
                     else if (extReqBean.getData() != null && extReqBean.getData().length > 0){
                         Object passedParamVal = extReqBean.getData()[jsonParamIndex];
 
-                        //if methodParamClass can be deserialized from a string to object
-                        if (methodParamClass.isAssignableFrom(Object.class) && !methodParamClass.getClass().equals(String.class) && !methodParamClass.isPrimitive() && passedParamVal.getClass().equals(String.class)){
-                            passedParamVal = JsonUtil.deserializeJsonToObject(passedParamVal.toString(), methodParamClass);
+                        
+                        if (!methodParamClass.isPrimitive()){//must be either string or object param
+                            passedParamVal = JsonUtil.serializeObjectToJson(passedParamVal);//serialize to json string first since Jackson mapper deserializes unknown objects to LinkedHashMap
+                            if (!methodParamClass.getClass().equals(String.class))//must be object param
+                                passedParamVal = JsonUtil.deserializeJsonToObject(passedParamVal.toString(), methodParamClass);
                         }
                         
                         jsonParamIndex++;
