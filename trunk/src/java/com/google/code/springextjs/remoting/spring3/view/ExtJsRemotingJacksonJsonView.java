@@ -31,16 +31,6 @@ public class ExtJsRemotingJacksonJsonView extends MappingJacksonJsonView{
      * @return the object to be rendered
      */
     protected Object filterModel(Map<String, Object> model) {
-        /*
-        for(Object obj : model.values()){
-            if (obj instanceof ExtJsDirectRemotingResponseBean)
-                return obj;
-        }*/
-        /*
-        for (String key : model.keySet()){
-            if (key.equals("extJsDirectRemotingResponseBean") || key.equals("extJsDirectRemotingResponseBeanList"))
-                return model.get(key);
-        }*/
         for (String key : model.keySet()){
             if (key.equals("JSONObject") || key.equals("JSONObjectList")
                 || key.equals("extJsDirectRemotingResponseBean") || key.equals("extJsDirectRemotingResponseBeanList"))

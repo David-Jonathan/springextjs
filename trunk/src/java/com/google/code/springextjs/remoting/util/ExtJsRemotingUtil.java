@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
 import com.google.code.springextjs.remoting.annotations.Annotations.ExtJsRemotingMethod;
 import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingRequestBean;
 import com.google.code.springextjs.remoting.bean.ExtJsRemotingApiActionBean;
@@ -23,6 +21,7 @@ import com.google.code.springextjs.remoting.spring3.controller.ExtJsRemotingCont
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.codehaus.jackson.type.TypeReference;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -93,18 +92,11 @@ public class ExtJsRemotingUtil {
                 rawRequestString = parseRawHttpRequest (request);
                 //multiple ext js remoting requests sent in one http request
                 if (rawRequestString.length() > 0 && rawRequestString.charAt(0) == '['){//should be an array, multiple batched requests likely
-                    JSONArray jarray = JsonLibUtil.serializeObjectToJSONArray(rawRequestString);
-                    for (int i = 0; i < jarray.size(); i++){
-                        ExtJsDirectRemotingRequestBean extReqBean =
-                            (ExtJsDirectRemotingRequestBean) JsonLibUtil.deserializeJSONObjectToObject(jarray.getJSONObject(i),ExtJsDirectRemotingRequestBean.class);
-                        reqs.add(extReqBean);
-                    }
+                    reqs.addAll(JsonUtil.serializeJsonArrayToList(rawRequestString, new TypeReference<List<ExtJsDirectRemotingRequestBean>>() { }));
                 }
                 //only one extjs remoting sent with this http request
                 else{
-                    JSONObject jsonObject = JsonLibUtil.serializeObjectToJSONObject(rawRequestString);
-                    ExtJsDirectRemotingRequestBean extReqBean =
-                            (ExtJsDirectRemotingRequestBean) JsonLibUtil.deserializeJSONObjectToObject(jsonObject,ExtJsDirectRemotingRequestBean.class);
+                    ExtJsDirectRemotingRequestBean extReqBean = (ExtJsDirectRemotingRequestBean) JsonUtil.deserializeJsonToObject(rawRequestString, ExtJsDirectRemotingRequestBean.class);
                     reqs.add(extReqBean);
                 }
             }
@@ -157,7 +149,7 @@ public class ExtJsRemotingUtil {
     
     private static String createExtRemotingApiString (String apiName, String url, Map<String, List<ExtJsRemotingApiActionBean>> remotingActionMap){
         ExtJsRemotingApiBean remotingActionBean = new ExtJsRemotingApiBean (url, EXT_DIRECT_REMOTING_TYPE, remotingActionMap);
-        String output = apiName + " = " + JsonLibUtil.serializeObjectToJSONObject(remotingActionBean).toString();
+        String output = apiName + " = " + JsonUtil.serializeObjectToJson(remotingActionBean);
         return output;
     }
 
