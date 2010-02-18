@@ -16,6 +16,7 @@ public class Annotations {
 
     @Retention(RetentionPolicy.RUNTIME)
     public @interface ExtJsRemotingMethod {
-        int paramLength();
+        int paramLength() default 0;
+        boolean formLoad () default false;
     }
 }

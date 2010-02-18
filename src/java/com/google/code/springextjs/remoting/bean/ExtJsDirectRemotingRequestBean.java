@@ -5,8 +5,6 @@
 
 package com.google.code.springextjs.remoting.bean;
 
-import net.sf.json.JSONArray;
-
 /**
  *
  * @author mansari
@@ -17,7 +15,7 @@ public class ExtJsDirectRemotingRequestBean {
     private String method;
     private String type;
     private int tid;
-    private JSONArray data;
+    private Object[] data;
     private boolean form;
     
     public ExtJsDirectRemotingRequestBean() {
@@ -31,13 +29,14 @@ public class ExtJsDirectRemotingRequestBean {
         this.action = action;
     }
 
-    public JSONArray getData() {
+    public Object[] getData() {
         return data;
     }
 
-    public void setData(JSONArray data) {
+    public void setData(Object[] data) {
         this.data = data;
     }
+    
 
     public String getMethod() {
         return method;
