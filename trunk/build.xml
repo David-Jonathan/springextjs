@@ -3,13 +3,13 @@
 
     <property name="classpath" value="${basedir}\lib\"/>
     <property name="project" value="springextjs" />
-    <property name="version" value="0.9.1-beta" />
+    <property name="version" value="0.9.2-beta" />
     <property name="jar.file" value="${project}-${version}.jar" />
     <property name="lib.dir" value="${basedir}\lib" />
     <property name="build.dir" value="${basedir}\build" />
     <property name="src" value="${basedir}\src\java" />
     <property name="war.dir" value="${basedir}\src\web" />
-    <property name="war.file" value="${project}-sample.war" />
+    <property name="war.file" value="${project}-${version}.war" />
 
     <path id="lib.classpath">
         <fileset dir="${classpath}">
@@ -49,7 +49,8 @@
     </target>
 
     <target name="jar" depends="compile">
-        <jar basedir="${build.dir}\java" destfile="${build.dir}\${jar.file}" includes="**/*.*" excludes="**/junit/** **/sample/**" />
+        <!--<jar basedir="${build.dir}\java" destfile="${build.dir}\${jar.file}" includes="**/*.*" excludes="**/junit/** **/sample/**" />-->
+        <jar basedir="${build.dir}\java" destfile="${build.dir}\${jar.file}" includes="**/*.*" excludes="" />
     </target>
 
     <target name="war" depends="jar" >
@@ -119,6 +120,7 @@
         <formatter type="plain" usefile="false" />
         <test name="com.google.code.springextjs.junit.remoting.ExtJsRemotingUtilTest" />
         <test name="com.google.code.springextjs.junit.remoting.ExtJsRemotingControllerTest" />
+        <test name="com.google.code.springextjs.junit.remoting.util.JsonUtilTest" />
       </junit>
     </target>
 
