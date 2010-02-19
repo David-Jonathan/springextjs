@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.ant.freeform</type>
+    <configuration>
+        <general-data xmlns="http://www.netbeans.org/ns/freeform-project/1">
+            <!-- Do not use Project Properties customizer when editing this file manually. -->
+            <name>springextjs</name>
+            <properties/>
+            <folders>
+                <source-folder>
+                    <label>src/java</label>
+                    <type>java</type>
+                    <location>src/java</location>
+                </source-folder>
+            </folders>
+            <ide-actions>
+                <action name="build">
+                    <target>compile</target>
+                </action>
+                <action name="clean">
+                    <target>clean</target>
+                </action>
+                <action name="run">
+                    <target>jar</target>
+                </action>
+                <action name="test">
+                    <target>junit</target>
+                </action>
+                <action name="rebuild">
+                    <target>clean</target>
+                    <target>compile</target>
+                </action>
+            </ide-actions>
+            <view>
+                <items>
+                    <source-folder style="packages">
+                        <label>src/java</label>
+                        <location>src/java</location>
+                    </source-folder>
+                    <source-file>
+                        <location>build.xml</location>
+                    </source-file>
+                </items>
+                <context-menu>
+                    <ide-action name="build"/>
+                    <ide-action name="rebuild"/>
+                    <ide-action name="clean"/>
+                    <ide-action name="run"/>
+                    <ide-action name="test"/>
+                </context-menu>
+            </view>
+            <subprojects/>
+        </general-data>
+        <java-data xmlns="http://www.netbeans.org/ns/freeform-project-java/1">
+            <compilation-unit>
+                <package-root>src/java</package-root>
+                <classpath mode="compile">lib/spring3/org.springframework.beans-3.0.0.RELEASE.jar:lib/spring3/org.springframework.context-3.0.0.RELEASE.jar:lib/spring3/org.springframework.core-3.0.0.RELEASE.jar:lib/spring3/org.springframework.test-3.0.0.RELEASE.jar:lib/spring3/org.springframework.web-3.0.0.RELEASE.jar:lib/spring3/org.springframework.web.servlet-3.0.0.RELEASE.jar:lib/servlet/servlet-api.jar:lib/junit/junit-4.4.jar:lib/commons/commons-io-1.3.2.jar:lib/commons/commons-logging-1.1.1.jar:lib/jackson/jackson-mapper-asl-1.3.2.jar:lib/jackson/jackson-xc-1.3.2.jar:lib/jackson/jackson-core-asl-1.3.2.jar:lib/jackson/jackson-jaxrs-1.3.2.jar</classpath>
+                <source-level>1.5</source-level>
+            </compilation-unit>
+        </java-data>
+    </configuration>
+</project>
