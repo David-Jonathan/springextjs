@@ -20,19 +20,19 @@ public class MockExtJsRemotingController extends ExtJsRemotingController{
     public MockExtJsRemotingController() {
     }
 
-    @ExtJsRemotingMethod (paramLength = 0)
+    @ExtJsRemotingMethod
     public String getConfig(){
         System.out.println ("Testing: getConfig");
         return "getConfig.called";
     }
 
-    @ExtJsRemotingMethod (paramLength = 0)
+    @ExtJsRemotingMethod
     public String doWork1 (){
         System.out.println ("Testing: doWork1");
         return "doWork1.called";
     }
 
-    @ExtJsRemotingMethod(paramLength = 3)
+    @ExtJsRemotingMethod
     @RequestMapping (method = RequestMethod.POST)
     public String doWork2 (long i, Double d, String s){
         System.out.println ("Testing: doWork2");
@@ -44,7 +44,7 @@ public class MockExtJsRemotingController extends ExtJsRemotingController{
         return "doWork3.called";
     }
 
-    @ExtJsRemotingMethod(paramLength = 3)
+    @ExtJsRemotingMethod
     @RequestMapping (value="/testFormMethod", method = RequestMethod.POST)
     public void testFormMethod (String queueName, long workgroupId){
 
