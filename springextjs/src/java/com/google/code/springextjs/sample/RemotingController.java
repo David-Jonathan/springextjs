@@ -21,12 +21,12 @@ public class RemotingController extends ExtJsRemotingController{
     public RemotingController() {
     }
 
-    @ExtJsRemotingMethod (paramLength = 1)
+    @ExtJsRemotingMethod
     public Long multiply (String num){
         return Long.valueOf(num)*8;
     }
 
-    @ExtJsRemotingMethod (paramLength = 1)
+    @ExtJsRemotingMethod
     public String doEcho (String message){
         return message;
     }

@@ -30,10 +30,10 @@ public class ExtJsRemotingJacksonJsonView extends MappingJacksonJsonView{
      * @param model the model, as passed on to {@link #renderMergedOutputModel}
      * @return the object to be rendered
      */
+    @Override
     protected Object filterModel(Map<String, Object> model) {
         for (String key : model.keySet()){
-            if (key.equals("JSONObject") || key.equals("JSONObjectList")
-                || key.equals("extJsDirectRemotingResponseBean") || key.equals("extJsDirectRemotingResponseBeanList"))
+            if (key.equals("extJsDirectRemotingResponseBean") || key.equals("extJsDirectRemotingResponseBeanList"))
                 return model.get(key);
         }
         return null;

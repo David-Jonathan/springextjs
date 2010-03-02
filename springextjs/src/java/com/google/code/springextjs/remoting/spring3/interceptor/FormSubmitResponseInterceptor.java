@@ -11,130 +11,187 @@ import com.google.code.springextjs.remoting.spring3.view.ExtJsRemotingJacksonJso
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.support.RequestContext;
 
 /**
  *
  * @author mansari
+ *
+ * This class is an interceptor for transforming a form processing MVC handlers
+ * returning ModelAndView into an ExtJs direct remoting response.
+ *
+ * This class will use a configured "localeResolver" for determining the locale
+ * of the request. It will also look for a "get" method which returns a
+ * MessageSource to find any field error's corresponding localized message.
+ * Success status for the form submit is determined by 
  */
 public class FormSubmitResponseInterceptor extends HandlerInterceptorAdapter{
 
     private static final Log log = LogFactory.getLog(FormSubmitResponseInterceptor.class);
-
-    private static final String MAIN_MESSAGE_KEY = "message";
     
     public FormSubmitResponseInterceptor() {
     }
 
+    /**
+     * This method transforms the form handlers returned ModelAndView into
+     * one which can be translated into JSON response which ExtJS direct
+     * hndlers in the browser can understand.
+     * @param request
+     * @param response
+     * @param handler
+     * @param modelAndView
+     */
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView){
-        if (handler.getClass().isAssignableFrom(ExtJsRemotingController.class)){
-
-            Map<String,Object> resultMap = new HashMap<String,Object>();
-            boolean isSuccess = true;
-
-            ExtJsDirectRemotingResponseBean extJsRemotingResponse = new ExtJsDirectRemotingResponseBean ();
-            extJsRemotingResponse.setAction(request.getParameter("extAction"));
-            extJsRemotingResponse.setMethod(request.getParameter("extMethod"));
-            extJsRemotingResponse.setType(request.getParameter("extType"));
-            extJsRemotingResponse.setTid(Integer.parseInt(request.getParameter("extTID")));
-
-            if (modelAndView != null){
-
-                //try and get message source
-                //try get locale for request
-                MessageSource messageSource = getMessageSource (handler);
-                Locale locale = getLocale (request);
-                
-                String mainMessage = (String) resultMap.get(MAIN_MESSAGE_KEY);
-                if (mainMessage != null && !mainMessage.isEmpty())
-                    resultMap.put(MAIN_MESSAGE_KEY, mainMessage);
-                
-                //get binding result by getting all BindingResult objects whose target is not ExtJsRemootingResponseBean
-                List<BindingResult> bindingResults  = getBindingResults (modelAndView);
-                if (bindingResults != null && !bindingResults.isEmpty()){
-                    Map<String, String> errorMap = new HashMap<String,String>();
-                    for (BindingResult bindingResult: bindingResults){
-                         //if any binding result has error, then success = false
-                        for (FieldError fieldError : bindingResult.getFieldErrors()){
-                            String message = fieldError.getDefaultMessage();
-                            if (messageSource != null){
-                                message = messageSource.getMessage(fieldError.getCode(), fieldError.getArguments(), locale);
-                            }
-                            if (message == null)
-                                message = "Field has error.";
-                            errorMap.put(fieldError.getField(), message);
-                       }
-                    }
-                    resultMap.put("errors", errorMap);
-                    isSuccess = errorMap.isEmpty();
-                }
-            }
-            extJsRemotingResponse.setSuccess(isSuccess);
-            extJsRemotingResponse.setResult(resultMap);
-
-            modelAndView =  new ModelAndView (new ExtJsRemotingJacksonJsonView());
-            modelAndView.addObject(extJsRemotingResponse);
+        if (ExtJsRemotingController.class.isAssignableFrom(handler.getClass())){
+            if (isValidFormSubmit(request, handler))
+                modelAndView = transformModelAndView (request, handler, modelAndView);
         }
     }
 
-    protected static Locale getLocale (HttpServletRequest request){
-        ApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(request.getSession().getServletContext());
-        LocaleResolver localeResolver = (LocaleResolver) context.getBean("localeResolver");
-        if (localeResolver != null)
-            return localeResolver.resolveLocale(request);
-        else 
-            return Locale.US;
-    }
+    private static boolean isValidFormSubmit (HttpServletRequest request, Object handler){
 
-    private static final List<BindingResult> getBindingResults (ModelAndView modelAndView){
-        List<BindingResult> bindingResults = new ArrayList<BindingResult>();
-        if (modelAndView != null){
-            Map<String, Object> models = modelAndView.getModel();
-            if (models != null && !models.isEmpty()){
-                for (String key : models.keySet()){
-                    Object model = models.get(key);
-                    if (model.getClass().isAssignableFrom(BindingResult.class)){
-                        BindingResult bindingResult = (BindingResult) model;
-                        if (!bindingResult.getTarget().getClass().isAssignableFrom(ExtJsDirectRemotingResponseBean.class))
-                            bindingResults.add(bindingResult);
-                    }
-                }
-            }
-        }
-        return bindingResults;
-    }
-    
-    private static final MessageSource getMessageSource (Object handler)
-    {
-        Method[] methods = handler.getClass().getMethods();
-        try{
+        String formSubmitMethodName = request.getParameter("extMethod");
+        if (formSubmitMethodName != null){
+            Method[] methods = handler.getClass().getDeclaredMethods();
             if (methods != null && methods.length > 0){
                 for (Method method: methods){
-                    if ((method.getReturnType() != null)
-                            && (MessageSource.class.isAssignableFrom(method.getReturnType()))
-                            && (method.getParameterTypes().length == 0))
-                        return (MessageSource) method.invoke(handler);
+                    if (method.getName().equals(formSubmitMethodName.trim())){
+                        RequestMapping requestMappingAnnotation =  method.getAnnotation(RequestMapping.class);
+                        String mappingVal = requestMappingAnnotation.value()[0];
+                        if (mappingVal != null)
+                            return (request.getPathInfo().contains(mappingVal));
+                    }
                 }
             }
         }
-        catch (Exception e){
-            log.error("Error: " + e,e);
-        }
-        return null;
+        return false;
+
     }
+
+    private static ModelAndView transformModelAndView (HttpServletRequest request, Object handler, ModelAndView modelAndView){
+
+        Map<String,Object> resultMap = new HashMap<String,Object>();
+        boolean isSuccess = true;
+
+        ExtJsDirectRemotingResponseBean extJsRemotingResponse = createExtJsDirectRemotingResponseFromRequest (request);
+
+        if (modelAndView != null){
+
+            RequestContext requestContext = new RequestContext (request);
+
+            MessageSource messageSource = requestContext.getMessageSource();
+            Locale locale = requestContext.getLocale();
+
+            Map<String, Object> models = modelAndView.getModel();
+            
+            List<BindingResult> bindingResults  = getBindingResults (models);
+
+            if ((models != null) && !models.isEmpty()){
+                for (String key: models.keySet()){
+                    if (models.get(key) != null)
+                        resultMap.put(key, models.get(key));//extract all other models which will get serialized in the json response
+                }
+            }
+
+            modelAndView.getModelMap().clear();
+
+            if (bindingResults != null && !bindingResults.isEmpty()){
+                Map<String, String> errorMap = new HashMap<String,String>();
+                for (BindingResult bindingResult: bindingResults){
+
+                    for (FieldError fieldError : bindingResult.getFieldErrors()){
+                        String message = fieldError.getDefaultMessage();
+                        if (messageSource != null){
+                            message = messageSource.getMessage(fieldError.getCode(), fieldError.getArguments(), locale);
+                        }
+                        errorMap.put(fieldError.getField(), message);
+                   }
+                }
+                resultMap.put("errors", errorMap);
+                isSuccess = errorMap.isEmpty();
+            }
+        }
+        extJsRemotingResponse.setSuccess(isSuccess);
+        resultMap.put("success", isSuccess);
+
+        extJsRemotingResponse.setSuccess(isSuccess);
+        extJsRemotingResponse.setResult(resultMap);
+
+        modelAndView.setView(new ExtJsRemotingJacksonJsonView());
+        modelAndView.addObject(extJsRemotingResponse);
+
+        return modelAndView;
+    }
+
+    private static ExtJsDirectRemotingResponseBean createExtJsDirectRemotingResponseFromRequest (HttpServletRequest request){
+
+        ExtJsDirectRemotingResponseBean extJsRemotingResponse = new ExtJsDirectRemotingResponseBean ();
+        extJsRemotingResponse.setAction(request.getParameter("extAction"));
+        extJsRemotingResponse.setMethod(request.getParameter("extMethod"));
+        extJsRemotingResponse.setType(request.getParameter("extType"));
+        extJsRemotingResponse.setTid(Integer.parseInt(request.getParameter("extTID")));
+
+        return extJsRemotingResponse;
+    }
+
+    /**
+     *
+     * @param modelAndView
+     * @return
+     */
+    private static List<BindingResult> getBindingResults (Map<String, Object> models){
+        List<BindingResult> bindingResults = new ArrayList<BindingResult>();
+        
+        if (models != null && !models.isEmpty()){
+
+            Set<String> keysToRemove = new HashSet<String>();//need to store in set to remove object later to avoid ConcurrentModificationException
+
+            //extracts binding results
+            for (String key : models.keySet()){
+                Object model = models.get(key);
+                if ((model != null) && (BindingResult.class.isAssignableFrom(model.getClass()))){
+                    BindingResult bindingResult = (BindingResult) models.get(key);
+                    keysToRemove.add(key);
+                    if (!bindingResult.getTarget().getClass().isAssignableFrom(ExtJsDirectRemotingResponseBean.class))
+                        bindingResults.add(bindingResult);
+                }
+            }
+
+            //finds key for binding result target objects
+            for (BindingResult bindingResult: bindingResults){
+                Object target = bindingResult.getTarget();
+                for (String key : models.keySet()){
+                    Object model = models.get(key);
+                    if (model != null && (model == target)){
+                        keysToRemove.add(key);
+                    }
+                }
+
+            }
+
+            //removes binding result and target objects from modelandview map
+            for (String key: keysToRemove){
+                models.remove(key);
+            }
+            
+        }
+        
+        return bindingResults;
+    }   
 }

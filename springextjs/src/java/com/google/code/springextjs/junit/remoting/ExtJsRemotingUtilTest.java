@@ -12,7 +12,7 @@ import java.util.List;
 import com.google.code.springextjs.junit.remoting.mock.MockExtJsRemotingController;
 import com.google.code.springextjs.junit.remoting.mock.MockExtJsRemotingHttpServletRequest;
 import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingRequestBean;
-import com.google.code.springextjs.remoting.util.ExtJsRemotingUtil;
+import com.google.code.springextjs.remoting.util.ExtJsDirectRemotingApiUtil;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,25 +31,8 @@ public class ExtJsRemotingUtilTest {
     }
 
     @Test
-    public void testGetExtDirectRemotingRequestBeans (){
-        List<ExtJsDirectRemotingRequestBean> extReqs = ExtJsRemotingUtil.getExtDirectRemotingRequestBeans(this.singleMethodRequestWithParam);
-        assertEquals(1, extReqs.size());
-
-        ExtJsDirectRemotingRequestBean extReq = extReqs.get(0);
-        assertEquals("Remoting", extReq.getAction());
-        assertEquals(3, extReq.getData().length);
-        assertEquals("getConfig", extReq.getMethod());
-        assertEquals(2, extReq.getTid());
-        assertEquals("rpc", extReq.getType());
-
-        assertEquals(Integer.class,extReq.getData()[0].getClass());
-        assertEquals(Double.class,extReq.getData()[1].getClass());
-        assertEquals(String.class,extReq.getData()[2].getClass());
-    }
-
-    @Test
     public void testCreateExtRemotingApiString (){
-        String api = ExtJsRemotingUtil.createExtRemotingApiString("www.google.com", MockExtJsRemotingController.class);
+        String api = ExtJsDirectRemotingApiUtil.getExtDirectRemotingApiString("www.google.com", MockExtJsRemotingController.class);
         assertNotNull (api);
     }
 

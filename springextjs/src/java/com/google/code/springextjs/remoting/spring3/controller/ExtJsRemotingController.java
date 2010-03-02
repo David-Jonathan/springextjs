@@ -7,16 +7,11 @@ package com.google.code.springextjs.remoting.spring3.controller;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.google.code.springextjs.remoting.annotations.Annotations.ExtJsRemotingMethod;
-import com.google.code.springextjs.remoting.util.ExtJsRemotingUtil;
 import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingRequestBean;
 import com.google.code.springextjs.remoting.bean.ExtJsDirectRemotingResponseBean;
 import com.google.code.springextjs.remoting.bean.ExtJsFormResultWrapperBean;
@@ -24,13 +19,18 @@ import com.google.code.springextjs.remoting.exceptions.UnAnnotatedFormHandlerExc
 import com.google.code.springextjs.remoting.exceptions.UnAnnotatedRemoteMethodException;
 import com.google.code.springextjs.remoting.util.JsonUtil;
 import com.google.code.springextjs.remoting.spring3.view.ExtJsRemotingJacksonJsonView;
+import com.google.code.springextjs.remoting.util.ExtJsDirectRemotingApiUtil;
+import com.google.code.springextjs.remoting.util.SupportedParamTypes;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.context.MessageSource;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+import org.codehaus.jackson.type.TypeReference;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -41,13 +41,36 @@ import org.springframework.web.servlet.ModelAndView;
 public abstract class ExtJsRemotingController {
 
     private static final Log log = LogFactory.getLog(ExtJsRemotingController.class);
-    
-    public static final String STATUS_KEY = "status";
-    public static final String SUCCESS_STATUS = "success";
-    public static final String FAIL_STATUS = "fail";
-    public static final String INVALID_SESSION_STATUS = "invalid-session";
 
     public ExtJsRemotingController() {
+    }
+
+    /**
+     * 
+     * @param request
+     * @param response
+     * @param actionName
+     * @return
+     */
+    @RequestMapping(value="/api/{actionName}", method = RequestMethod.GET)
+    @ResponseBody
+    public final String api (HttpServletRequest request,HttpServletResponse response, @PathVariable String actionName){
+        
+        response.setContentType("text/javascript");
+        return ExtJsDirectRemotingApiUtil.getExtDirectRemotingApiString(request.getPathInfo(), this.getClass(), actionName);
+    }
+
+    /**
+     * 
+     * @param request
+     * @param response
+     * @return
+     */
+    @RequestMapping(value="/api", method = RequestMethod.GET)
+    @ResponseBody
+    public final String api (HttpServletRequest request,HttpServletResponse response){
+        response.setContentType("text/javascript");
+        return ExtJsDirectRemotingApiUtil.getExtDirectRemotingApiString(request.getPathInfo(), this.getClass());
     }
 
     /**
@@ -61,9 +84,9 @@ public abstract class ExtJsRemotingController {
      * @throws UnAnnotatedRemoteMethodException
      */
     @RequestMapping(value="/router", method = RequestMethod.POST)
-    public ModelAndView router(HttpServletRequest request,HttpServletResponse response, Locale locale) throws UnAnnotatedRemoteMethodException{
+    public final ModelAndView router(HttpServletRequest request,HttpServletResponse response, Locale locale) throws UnAnnotatedRemoteMethodException{
 
-        List<ExtJsDirectRemotingRequestBean> extRemotingRequests = ExtJsRemotingUtil.getExtDirectRemotingRequestBeans (request);
+        List<ExtJsDirectRemotingRequestBean> extRemotingRequests = getExtDirectRemotingRequestBeans (request);
         List<ExtJsDirectRemotingResponseBean> extJsRemotingResponses = new ArrayList<ExtJsDirectRemotingResponseBean>();
         for (ExtJsDirectRemotingRequestBean extReqBean : extRemotingRequests){
             ExtJsDirectRemotingResponseBean extJsRemotingResponse = createBaseResponse(extReqBean);
@@ -76,6 +99,7 @@ public abstract class ExtJsRemotingController {
                     String forwardPath = getForwardPathForFormMethod (this, extReqBean, request);
                     if (log.isDebugEnabled())
                         log.debug("Form forward path: " + forwardPath);
+                    
                     return new ModelAndView("forward:" + forwardPath);
                 }
                 else{
@@ -107,56 +131,6 @@ public abstract class ExtJsRemotingController {
         }
         
         return responseModelAndView (extJsRemotingResponses);
-    }
-
-    /**
-     * This method needs to be called by class which extends this ExtJS remoting
-     * form handling methods.
-     *
-     * @param request
-     * @param isSuccess Flag stating if the form submission completed successfully.
-     * @param locale Can be null
-     * @param messageSource - Can be null, Message resource object which has internationalized
-     * messages for form field validation failures. This method preserves Springs
-     * validation error handling on form submissions and displays field errors
-     * using ExtJS native field error rendering.
-     
-     * @param mainMessage Can be null, A Message which is passed back to browser and can be used
-     * to display form submission message. The message is passed in the return JSON but
-     * it is up to the developer to display it part of the form submit callback.
-     * @param bindingResult Can be null
-     * @return
-     */
-    protected ModelAndView remotingFormPostModelAndView (HttpServletRequest request, boolean isSuccess, Locale locale, MessageSource messageSource,String mainMessage, BindingResult bindingResult){
-        ExtJsDirectRemotingResponseBean extJsRemotingResponse = new ExtJsDirectRemotingResponseBean ();
-        
-        extJsRemotingResponse.setSuccess(isSuccess);
-        extJsRemotingResponse.setAction(request.getParameter("extAction"));
-        extJsRemotingResponse.setMethod(request.getParameter("extMethod"));
-        extJsRemotingResponse.setType(request.getParameter("extType"));
-        extJsRemotingResponse.setTid(Integer.parseInt(request.getParameter("extTID")));
-
-        Map<String,Object> result = new HashMap<String,Object>();
-        //process main message
-        if (mainMessage != null && !mainMessage.isEmpty())
-            result.put("message", mainMessage);
-        
-        result.put("success", isSuccess);
-        if (bindingResult != null && bindingResult.hasFieldErrors()){
-            Map<String, String> errorMap = new HashMap<String,String>();
-            for (FieldError fieldError : bindingResult.getFieldErrors()){
-                String message = fieldError.getDefaultMessage();
-                if (messageSource != null){
-                    locale = (locale != null ? locale : Locale.ENGLISH);
-                    message = messageSource.getMessage(fieldError.getCode(), fieldError.getArguments(), locale);
-                }
-                errorMap.put(fieldError.getField(), message);
-           }
-           result.put("errors", errorMap);//this must be present if issuccess == false   
-        }
-
-        extJsRemotingResponse.setResult(result);
-        return responseModelAndView (extJsRemotingResponse);
     }
 
     /**
@@ -202,17 +176,17 @@ public abstract class ExtJsRemotingController {
                 int jsonParamIndex = 0;
                 for (Class methodParamClass : classes){
 
-
-                    if (ServletResponse.class.isAssignableFrom(methodParamClass)){
-                        params[paramIndex] = response;
+                    if (SupportedParamTypes.isSupported(methodParamClass)){
+                        if (SupportedParamTypes.ServletResponse.getSupportedClass().isAssignableFrom(methodParamClass)){
+                            params[paramIndex] = response;
+                        }
+                        else if (SupportedParamTypes.ServletRequest.getSupportedClass().isAssignableFrom(methodParamClass)){
+                            params[paramIndex] = request;
+                        }
+                        else if (SupportedParamTypes.Locale.getSupportedClass().isAssignableFrom(methodParamClass)){
+                            params[paramIndex] = locale;
+                        }
                     }
-                    else if (ServletRequest.class.isAssignableFrom(methodParamClass)){
-                        params[paramIndex] = request;
-                    }
-                    else if (Locale.class.isAssignableFrom(methodParamClass)){
-                        params[paramIndex] = locale;
-                    }
-
                     else if (extReqBean.getData() != null && extReqBean.getData().length > 0){
                         Object passedParamVal = extReqBean.getData()[jsonParamIndex];
 
@@ -277,5 +251,60 @@ public abstract class ExtJsRemotingController {
         extJsRemotingResponse.setTid(extReqBean.getTid());
         extJsRemotingResponse.setType(extReqBean.getType());
         return extJsRemotingResponse;
+    }
+
+    /**
+     * This method abstracts the http requet by transforming the raw
+     * http request to one or more ExtJsDirectRemotingRequestBean's.
+     * Returns list of ExtJs remoting requests.
+     * @param request Http request
+     * @return List of one or more ExtJsDirectRemotingRequestBean objects.
+     *  In case of form submit using post, the list will contain only one object.
+     */
+    private static List<ExtJsDirectRemotingRequestBean> getExtDirectRemotingRequestBeans (HttpServletRequest request){
+        List<ExtJsDirectRemotingRequestBean> reqs = new ArrayList<ExtJsDirectRemotingRequestBean>();
+
+        //must check if parameter passed since reading the raw request body can interfere with the state of the request object in further transactions
+        String extPostRemoteMethod = request.getParameter("extMethod");
+        if (extPostRemoteMethod != null){
+            ExtJsDirectRemotingRequestBean extReqBean = new ExtJsDirectRemotingRequestBean();
+            extReqBean.setMethod(extPostRemoteMethod);
+            extReqBean.setForm(true);
+            reqs.add(extReqBean);
+        }
+        else{//parse raw request body if not a post request
+            String rawRequestString = null;
+            try{
+                rawRequestString = parseRawHttpRequest (request);
+                //multiple ext js remoting requests sent in one http request
+                if (rawRequestString.length() > 0 && rawRequestString.charAt(0) == '['){//should be an array, multiple batched requests likely
+                    reqs.addAll(JsonUtil.serializeJsonArrayToList(rawRequestString, new TypeReference<List<ExtJsDirectRemotingRequestBean>>() { }));
+                }
+                //only one extjs remoting sent with this http request
+                else{
+                    ExtJsDirectRemotingRequestBean extReqBean = (ExtJsDirectRemotingRequestBean) JsonUtil.deserializeJsonToObject(rawRequestString, ExtJsDirectRemotingRequestBean.class);
+                    reqs.add(extReqBean);
+                }
+            }
+            catch (Exception e){
+                log.error("Error: " + e, e);
+            }
+        }
+        return reqs;
+    }
+
+    private static String parseRawHttpRequest (HttpServletRequest request) throws Exception{
+
+        Reader input = request.getReader();
+        Writer output = new StringWriter ();
+        char[] buffer = new char[1024 * 4];
+        
+        int n = 0;
+        while (-1 != (n = input.read(buffer))) {
+            output.write(buffer, 0, n);
+        }
+
+        String requestString = output.toString();
+        return requestString;
     }
 }
