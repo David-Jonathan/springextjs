@@ -57,7 +57,11 @@ public abstract class ExtJsRemotingController {
     public final String api (HttpServletRequest request,HttpServletResponse response, @PathVariable String actionName){
         
         response.setContentType("text/javascript");
-        return ExtJsDirectRemotingApiUtil.getExtDirectRemotingApiString(request.getPathInfo(), this.getClass(), actionName);
+
+        String routerPath = request.getPathInfo();
+        routerPath = request.getContextPath() + routerPath.substring(0, routerPath.indexOf("/api")) + "/router";
+
+        return ExtJsDirectRemotingApiUtil.getExtDirectRemotingApiString(routerPath, this.getClass(), actionName);
     }
 
     /**
@@ -70,7 +74,11 @@ public abstract class ExtJsRemotingController {
     @ResponseBody
     public final String api (HttpServletRequest request,HttpServletResponse response){
         response.setContentType("text/javascript");
-        return ExtJsDirectRemotingApiUtil.getExtDirectRemotingApiString(request.getPathInfo(), this.getClass());
+
+        String routerPath = request.getPathInfo();
+        routerPath = request.getContextPath() + routerPath.substring(0, routerPath.indexOf("/api")) + "/router";
+
+        return ExtJsDirectRemotingApiUtil.getExtDirectRemotingApiString(routerPath, this.getClass());
     }
 
     /**
@@ -118,7 +126,6 @@ public abstract class ExtJsRemotingController {
             catch (Exception e){
                 log.error("Error on method: " + extReqBean.getMethod(),e);
                 
-                extJsRemotingResponse.setSuccess(false);
                 if (log.isDebugEnabled()){
                     extJsRemotingResponse.setType("exception");
                     extJsRemotingResponse.setMessage(e.getMessage());

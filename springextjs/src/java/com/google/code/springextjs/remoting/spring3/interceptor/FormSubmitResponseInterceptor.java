@@ -123,14 +123,13 @@ public class FormSubmitResponseInterceptor extends HandlerInterceptorAdapter{
                         errorMap.put(fieldError.getField(), message);
                    }
                 }
-                resultMap.put("errors", errorMap);
                 isSuccess = errorMap.isEmpty();
+                if (!isSuccess)
+                    resultMap.put("errors", errorMap);
+                
             }
         }
-        extJsRemotingResponse.setSuccess(isSuccess);
         resultMap.put("success", isSuccess);
-
-        extJsRemotingResponse.setSuccess(isSuccess);
         extJsRemotingResponse.setResult(resultMap);
 
         modelAndView.setView(new ExtJsRemotingJacksonJsonView());
