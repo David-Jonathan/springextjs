@@ -11,14 +11,16 @@ package com.google.code.springextjs.remoting.bean;
  */
 public class ExtJsDirectRemotingResponseBean {
     
-    private String type;
+    
     private int tid;
     private String action;
     private String method;
     private Object result;
+
+    //debug fields
+    private String type;
     private String message;
     private String where;
-    private boolean success = true;
     
     public ExtJsDirectRemotingResponseBean() {
     }
@@ -77,17 +79,6 @@ public class ExtJsDirectRemotingResponseBean {
 
     public void setWhere(String where) {
         this.where = where;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-
-    
-    
+    } 
 
 }

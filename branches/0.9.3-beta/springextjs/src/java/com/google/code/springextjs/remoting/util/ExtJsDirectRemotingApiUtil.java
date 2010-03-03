@@ -29,10 +29,10 @@ public class ExtJsDirectRemotingApiUtil {
 
     private static final Log log = LogFactory.getLog(ExtJsDirectRemotingApiUtil.class);
 
-    private static final Map<RemotingApiId,String> REMOTING_API_MAP = new HashMap<RemotingApiId,String>();
+    private static final Map<String,String> REMOTING_API_MAP = new HashMap<String,String>();
 
-    public static final String EXT_DIRECT_REMOTING_TYPE = "remoting";
-    public static final String EXT_DIRECT_POLLING_TYPE = "polling";
+    private static final String EXT_DIRECT_REMOTING_TYPE = "remoting";
+    private static final String EXT_DIRECT_POLLING_TYPE = "polling";
 
     /**
      * See createExtRemotingApiString (String remoteServiceUrl, Class<? extends ExtJsRemotingController> clazz, String remotingActionName)
@@ -74,10 +74,8 @@ public class ExtJsDirectRemotingApiUtil {
                 remotingActionName = remotingActionName.substring(remotingActionName.lastIndexOf(".")+1, remotingActionName.length());
             }
         }
-
-        RemotingApiId key = new RemotingApiId (clazz.getName(),remotingActionName);
         
-        if (REMOTING_API_MAP.get(key) == null){
+        if (REMOTING_API_MAP.get(remotingActionName) == null){
             
             List<ExtJsRemotingApiActionBean> apiBeans = new ArrayList<ExtJsRemotingApiActionBean>();
 
@@ -104,9 +102,10 @@ public class ExtJsDirectRemotingApiUtil {
 
             
             map.put(remotingActionName, apiBeans);
-            REMOTING_API_MAP.put(key, createExtRemotingApiString (remotingActionName, remoteServiceUrl, map));
+            REMOTING_API_MAP.put(remotingActionName, createExtRemotingApiString (remotingActionName, remoteServiceUrl, map));
+            log.info ("Remoting API added to cache: " + remotingActionName);
         }
-        return REMOTING_API_MAP.get(key);
+        return REMOTING_API_MAP.get(remotingActionName);
     }
     
     private static String createExtRemotingApiString (String apiName, String url, Map<String, List<ExtJsRemotingApiActionBean>> remotingActionMap){
@@ -125,47 +124,5 @@ public class ExtJsDirectRemotingApiUtil {
         }
         return counter;
     }
-
-}
-
-class RemotingApiId {
-    private String className;
-    private String action;
-
-    public RemotingApiId(String className, String action) {
-        this.className = className;
-        this.action = action;
-    }
-
-    
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final RemotingApiId other = (RemotingApiId) obj;
-        if ((this.className == null) ? (other.className != null) : !this.className.equals(other.className)) {
-            return false;
-        }
-        if ((this.action == null) ? (other.action != null) : !this.action.equals(other.action)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 43 * hash + (this.className != null ? this.className.hashCode() : 0);
-        hash = 43 * hash + (this.action != null ? this.action.hashCode() : 0);
-        return hash;
-    }
-
-    
-
 
 }
