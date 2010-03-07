@@ -74,8 +74,9 @@ public class ExtJsDirectRemotingApiUtil {
                 remotingActionName = remotingActionName.substring(remotingActionName.lastIndexOf(".")+1, remotingActionName.length());
             }
         }
-        
-        if (REMOTING_API_MAP.get(remotingActionName) == null){
+
+        String apiString = REMOTING_API_MAP.get(clazz.getName());
+        if (apiString == null){
             
             List<ExtJsRemotingApiActionBean> apiBeans = new ArrayList<ExtJsRemotingApiActionBean>();
 
@@ -102,10 +103,11 @@ public class ExtJsDirectRemotingApiUtil {
 
             
             map.put(remotingActionName, apiBeans);
-            REMOTING_API_MAP.put(remotingActionName, createExtRemotingApiString (remotingActionName, remoteServiceUrl, map));
+            apiString = createExtRemotingApiString (remotingActionName, remoteServiceUrl, map);
+            REMOTING_API_MAP.put(clazz.getName(), apiString);
             log.info ("Remoting API added to cache: " + remotingActionName);
         }
-        return REMOTING_API_MAP.get(remotingActionName);
+        return apiString;
     }
     
     private static String createExtRemotingApiString (String apiName, String url, Map<String, List<ExtJsRemotingApiActionBean>> remotingActionMap){
