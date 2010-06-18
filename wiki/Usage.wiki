@@ -71,6 +71,8 @@ public ModelAndView updateForm(Locale locale, HttpServletRequest request, @Valid
 
 The parameters are limited to what Spring is limited to.
 
+Form submits can take full advantage of Spring localized field validations and render validation responses in ExtJS components (see example application).
+
 =Form Handler Method Results=
 
 The return value of a form handler method should return Spring's ModelAndView object.
@@ -233,3 +235,5 @@ due to bug in ExtJs, tree loading controller methods must have at least one para
 }}}
 
 Otherwise a response will be generated but the TreeLoader loading animation will get stuck.
+
+*Refer to the demo application for detailed examples including form loads, form submits, server side form validation with localize messages, and more...
