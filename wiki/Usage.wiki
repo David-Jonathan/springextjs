@@ -198,7 +198,11 @@ public class DemoExtJsDirectRemotingController extends ExtJsDirectRemotingContro
 }}}
 }}}
 
-Then the API url to add to the script src element would be *http://localhost:8000/springextjs/controller/extjs/remoting/api*.
+Then the API URLto add to the script src element would look like:
+
+{{{
+<script type="text/javascript" src="http://localhost:8000/springextjs/controller/extjs/remoting/api"></script>
+}}}
 
 =Router End Point=
 
