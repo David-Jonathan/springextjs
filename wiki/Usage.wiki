@@ -83,7 +83,7 @@ Your Spring app context should have the MVC interceptor to handle form responses
 
 }}}
 
-So, you Sprint context file may look like:
+So, you Spring context file may look like:
 
 {{{
 <?xml version="1.0" encoding="UTF-8"?>
