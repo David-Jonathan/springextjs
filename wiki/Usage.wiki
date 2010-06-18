@@ -136,7 +136,7 @@ Any remoting method which is a form load must contain the *formLoad = true* @Ext
 
 {{{
 @ExtJsRemotingMethod (formLoad = true)
-	public Form loadForm (String name, String email){
+public Form loadForm (String name, String email){
 	Form form = new Form();
 	form.setName(name);
 	form.setEmail(email);
