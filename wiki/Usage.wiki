@@ -53,7 +53,7 @@ All methods which are form handlers should be annotated using Springs standard a
 @RequestMapping (value="/updateUser", method = RequestMethod.POST)
 }}}
 
-And return ModelAndView. They can also use any standard Spring annotations as needed, so the methos may look something like this:
+And return ModelAndView. They can also use any standard Spring annotations as needed, so a method may look something like this:
 
 {{{
 @ExtJsDirectRemotingAnnotations.ExtJsRemotingMethod
