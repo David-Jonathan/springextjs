@@ -69,7 +69,7 @@ public ModelAndView updateForm(Locale locale, HttpServletRequest request, @Valid
 }
 }}}
 
-The parameters are limited to what Spring is limited to.
+The parameters are limited to what Spring limits them to.
 
 Form submits can take full advantage of Spring localized field validations and render validation responses in ExtJS components (see example application).
 
