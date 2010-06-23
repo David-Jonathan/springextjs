@@ -29,7 +29,7 @@ public class DemoExtJsDirectRemotingController extends ExtJsDirectRemotingContro
 }
 }}}
 
-Note that implementing MessageSourceAware is a Spring if you want to access localized messages in your controllerm, 
+Note that implementing MessageSourceAware is a Spring thing if you want to access localized messages in your controller, 
 if not, leave it out.
 
 = Non Form Handler Methods in Controller =
