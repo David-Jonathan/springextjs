@@ -191,13 +191,11 @@ You can just as easily call the utility on the server and pass the generated Ext
 Another option is to use the URL directly by appending /api to your controller endpoint URL. For example, if you controller is mapped:
 
 {{{
-{{{
 @Controller
 @RequestMapping(value = "/extjs/remoting")
 public class DemoExtJsDirectRemotingController extends ExtJsDirectRemotingController implements MessageSourceAware{
 ...
 }
-}}}
 }}}
 
 Then the API URLto add to the script src element would look like:
