@@ -4,7 +4,7 @@ How to use springextjs
 
 The goal of this project is to easily integrate Spring3 with ExtJS Direct specification.
 The main idea was to write Spring MVC controller as you would for any project, and let springextjs
-handle call the translation down to ExtJS.
+handle the call translation down to ExtJS.
 
 I have tried to make it as simple as possible but I am sure there is much room for improvement. 
 
