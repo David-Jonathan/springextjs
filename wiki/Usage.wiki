@@ -56,7 +56,7 @@ All methods which are form handlers should be annotated using Springs standard a
 And return ModelAndView. They can also use any standard Spring annotations as needed, so a method may look something like this:
 
 {{{
-@ExtJsDirectRemotingAnnotations.ExtJsRemotingMethod
+@ExtJsRemotingMethod
 @RequestMapping (value="/updateForm", method = RequestMethod.POST)//standard Spring form post annotation
 public ModelAndView updateForm(Locale locale, HttpServletRequest request, @Valid Form form, BindingResult result){//standard Spring supported parameters
 	String message = null;
