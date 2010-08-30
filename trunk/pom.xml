@@ -7,9 +7,41 @@
 
     <groupId>com.google.code.springextjs</groupId>
     <artifactId>spring-extjs</artifactId>
-    <version>1.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <inceptionYear>2010</inceptionYear>
+
+    <name>SpringExtJs</name>
+    <description>Implements the Ext.Direct specification with Java/Spring 3</description>
+    <url>http://code.google.com/p/springextjs/</url>
+
+    <developers>
+        <developer>
+          <name>Mohammed Ansari</name>
+          <email>moshan480@gmail.com</email>
+        </developer>
+    </developers>
+
+    <licenses>
+        <license>
+          <name>Apache 2</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+          <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <issueManagement>
+        <system>Google Code</system>
+        <url>http://code.google.com/p/springextjs/issues</url>
+    </issueManagement>
+    
+    <scm>
+        <connection>scm:svn:http://springextjs.googlecode.com/svn/trunk</connection>
+        <developerConnection>scm:svn:https://springextjs.googlecode.com/svn/trunk</developerConnection>
+        <url>http://springextjs.googlecode.com/svn/trunk</url>
+    </scm>    
+    
     <modules>
         <module>spring-extjs-lib</module>
         <module>spring-extjs-demo</module>
@@ -29,7 +61,7 @@
     </repositories>
     
     <build>
-        <finalName>spring-extjs-1.0</finalName>
+        <finalName>spring-extjs-${version}</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
