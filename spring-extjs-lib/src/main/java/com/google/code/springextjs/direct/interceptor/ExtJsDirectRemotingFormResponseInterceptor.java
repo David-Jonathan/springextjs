@@ -8,6 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -106,7 +107,19 @@ public class ExtJsDirectRemotingFormResponseInterceptor extends HandlerIntercept
                             message = messageSource.getMessage(fieldError.getCode(), fieldError.getArguments(), locale);
                         }
                         errorMap.put(fieldError.getField(), message);
-                   }
+                    }
+                    for (ObjectError objectError: bindingResult.getGlobalErrors()){
+                        String message = objectError.getDefaultMessage();
+                        if (messageSource != null){
+                            if (objectError.getCodes() != null && objectError.getCodes().length > 0){
+                                message = messageSource.getMessage(objectError.getCode(), objectError.getArguments(), locale);
+                            }
+                            else{
+                                message = objectError.getDefaultMessage();    
+                            }
+                        }
+                        errorMap.put(objectError.getObjectName(), message);    
+                    }
                 }
                 isSuccess = errorMap.isEmpty();
                 if (!isSuccess)
