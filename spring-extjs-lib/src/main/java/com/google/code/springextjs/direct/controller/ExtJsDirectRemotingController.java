@@ -138,7 +138,7 @@ public class ExtJsDirectRemotingController {
                     extJsRemotingResponse.setWhere(e.getMessage());
                 }
                 else
-                     extJsRemotingResponse.setMessage("ajax.server.error.message");
+                     extJsRemotingResponse.setMessage(e.getMessage());
             }
             extJsRemotingResponses.add(extJsRemotingResponse);
         }
