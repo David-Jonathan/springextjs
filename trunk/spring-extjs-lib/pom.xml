@@ -7,14 +7,13 @@
     <parent>
         <groupId>com.google.code.springextjs</groupId>
         <artifactId>spring-extjs</artifactId>
-        <version>1.0.1-SNAPSHOT</version>       
+        <version>1.0.2-SNAPSHOT</version>       
     </parent>
     
     <groupId>com.google.code.springextjs</groupId>
     <artifactId>spring-extjs-lib</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    
+    <version>1.0.2-SNAPSHOT</version>
+    <packaging>jar</packaging> 
 
     <properties>        
         <spring.version>3.0.0.RELEASE</spring.version>

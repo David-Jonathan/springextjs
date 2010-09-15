@@ -7,7 +7,7 @@
 
     <groupId>com.google.code.springextjs</groupId>
     <artifactId>spring-extjs</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <inceptionYear>2010</inceptionYear>
@@ -79,7 +79,7 @@
                     </excludes>
                 </configuration>
             </plugin>
-        </plugins>
+        </plugins>      
     </build>
 
     <dependencies>
