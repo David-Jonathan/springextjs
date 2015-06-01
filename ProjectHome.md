@@ -1,0 +1,1 @@
+Using the base controller and annotations to decorate controller handlers, this library will automatically generate the ExtJS Direct Remoting API and bind the JavaScript functions to corresponding server side methods implemented using Spring MVC.
